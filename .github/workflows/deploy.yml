@@ -1,4 +1,4 @@
-name: Deploy
+name: deploy
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,11 +22,6 @@ jobs:
         run: |
           sudo systemctl start docker
           sudo systemctl enable docker
-
-      - name: Check Docker Version
-        run: |
-          docker --version
-          docker compose version || docker-compose version
 
       - name: Deploy using Docker Compose
         run: |
