@@ -12,19 +12,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Fix Docker Dependencies
+      - name: Install Dependencies
         run: |
-          sudo apt-get remove -y containerd.io containerd docker.io docker-ce docker-ce-cli
           sudo apt-get update
+          sudo apt-get remove -y containerd.io containerd docker.io docker-ce docker-ce-cli || true
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
       - name: Start Docker Service
         run: |
           sudo systemctl start docker
           sudo systemctl enable docker
-          sudo usermod -aG docker $USER
+
+      - name: Check Docker & Compose Version
+        run: |
+          docker --version
+          docker compose version || docker-compose version
 
       - name: Deploy using Docker Compose
         run: |
-          sudo docker compose down
-          sudo docker compose up -d --build
+          COMPOSE_CMD=$(command -v docker-compose || echo "docker compose")
+          sudo $COMPOSE_CMD down
+          sudo $COMPOSE_CMD up -d --build
