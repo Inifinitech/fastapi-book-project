@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Docker
+        run: |
+          sudo apt update
+          sudo apt install -y docker.io
+
+      - name: Deploy using Docker Compose
+        run: |
+            docker-compose down
+            docker-compose up -d --build
+
+      - name: Build and run the container
+        run: |
+          docker stop fastapi-container || true
+          docker rm fastapi-container || true
+          docker build -t fastapi-app .
+          docker run -d --name fastapi-container -p 80:8000 fastapi-app
