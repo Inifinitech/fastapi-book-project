@@ -22,6 +22,13 @@ jobs:
             docker-compose down
             docker-compose up -d --build
 
+      - name: Fix Docker Dependencies
+        run: |
+          sudo apt-get remove -y containerd
+          sudo apt-get update
+          sudo apt-get install -y containerd.io docker-ce docker-ce-cli
+      
+
       - name: Build and run the container
         run: |
           docker stop fastapi-container || true
