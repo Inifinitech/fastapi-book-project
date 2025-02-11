@@ -12,18 +12,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Install Moby (Docker Alternative)
         run: |
           sudo apt-get update
-          sudo apt-get remove -y containerd.io containerd docker.io docker-ce docker-ce-cli || true
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo apt-get install -y moby-engine moby-cli
 
       - name: Start Docker Service
         run: |
           sudo systemctl start docker
           sudo systemctl enable docker
 
-      - name: Check Docker & Compose Version
+      - name: Check Docker Version
         run: |
           docker --version
           docker compose version || docker-compose version
