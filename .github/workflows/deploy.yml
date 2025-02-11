@@ -12,26 +12,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Docker
+      - name: Fix Docker Dependencies
         run: |
-          sudo apt update
-          sudo apt install -y docker.io
+          sudo apt-get remove -y containerd.io containerd docker.io docker-ce docker-ce-cli
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Start Docker Service
+        run: |
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          sudo usermod -aG docker $USER
 
       - name: Deploy using Docker Compose
         run: |
-            docker-compose down
-            docker-compose up -d --build
-
-      - name: Fix Docker Dependencies
-        run: |
-          sudo apt-get remove -y containerd
-          sudo apt-get update
-          sudo apt-get install -y containerd.io docker-ce docker-ce-cli
-      
-
-      - name: Build and run the container
-        run: |
-          docker stop fastapi-container || true
-          docker rm fastapi-container || true
-          docker build -t fastapi-app .
-          docker run -d --name fastapi-container -p 80:8000 fastapi-app
+          sudo docker compose down
+          sudo docker compose up -d --build
