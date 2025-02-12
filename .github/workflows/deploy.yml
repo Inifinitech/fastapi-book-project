@@ -11,9 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Deploy application
+      - name: Trigger Render Deployment
         run: |
-          # Replace this with your deployment command
-          ssh user@server 'cd /path/to/app && git pull && systemctl restart yourapp'
+            curl -X POST "https://api.render.com/deploy/srv-xxxxxxxxxxxx" \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
