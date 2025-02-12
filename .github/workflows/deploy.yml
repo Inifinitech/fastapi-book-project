@@ -1,0 +1,19 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy application
+        run: |
+          # Replace this with your deployment command
+          ssh user@server 'cd /path/to/app && git pull && systemctl restart yourapp'
