@@ -15,22 +15,23 @@ jobs:
 
       - name: Setup SSH Key
         run: |
-          mkdir -p ~/.ssh  # Ensure the .ssh directory exists
+          mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ~/.ssh/ec2-key.pem
-          chmod 600 ~/.ssh/ec2-key.pem  # Ensure correct permissions
+          chmod 600 ~/.ssh/ec2-key.pem
 
       - name: Add EC2 to known hosts
         run: |
           ssh-keyscan -H 54.160.243.61 >> ~/.ssh/known_hosts
 
-      - name: Test SSH Connection (Check Before Deployment)
+      - name: Test SSH Connection
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@54.160.243.61 "echo 'SSH connection successful'"
 
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
-            cd /path/to/your/project
+            cd /home/ec2-user/fastapi-book-project
             git pull origin main
-            sudo systemctl restart your-service-name  # Restart FastAPI app if needed
+            sudo yum install -y git
+            sudo systemctl restart fastapi  # Update this with your actual service name
           EOF
