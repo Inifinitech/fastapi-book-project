@@ -13,18 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add SSH key
+      - name: Setup SSH Key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ec2-key.pem
-          chmod 600 ec2-key.pem
+          mkdir -p ~/.ssh  # Ensure the .ssh directory exists
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ~/.ssh/ec2-key.pem
+          chmod 600 ~/.ssh/ec2-key.pem
 
       - name: Add EC2 to known hosts
-        run: ssh-keyscan 54.160.243.61 >> ~/.ssh/known_hosts
+        run: |
+          ssh-keyscan 54.160.243.61 >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
-          ssh -i ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
-            cd /home/ec2-user/your-project-folder  # Change this to your actual project path
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
+            cd /path/to/your/project
             git pull origin main
             sudo systemctl restart your-service-name  # Restart FastAPI app if needed
           EOF
