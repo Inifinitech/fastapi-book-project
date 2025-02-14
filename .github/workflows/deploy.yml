@@ -15,8 +15,8 @@ jobs:
 
       - name: Add SSH key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem
-          chmod 600 ec2-key.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ec2-key.pem
+          chmod 400 ec2-key.pem
 
       - name: Deploy to EC2
         run: |
@@ -25,4 +25,3 @@ jobs:
             git pull origin main
             sudo systemctl restart your-service-name  # Restart FastAPI app if needed
           EOF
-
