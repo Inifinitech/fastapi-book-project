@@ -17,11 +17,19 @@ jobs:
         run: |
           mkdir -p ~/.ssh  # Ensure the .ssh directory exists
           echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ~/.ssh/ec2-key.pem
-          chmod 600 ~/.ssh/ec2-key.pem
+          chmod 600 ~/.ssh/ec2-key.pem  # Ensure correct permissions
+
+      - name: Fix Line Endings (VERY IMPORTANT 🔥)
+        run: |
+          dos2unix ~/.ssh/ec2-key.pem  # Fix key format issues (install if needed)
 
       - name: Add EC2 to known hosts
         run: |
-          ssh-keyscan 54.160.243.61 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 54.160.243.61 >> ~/.ssh/known_hosts
+
+      - name: Test SSH Connection (Check Before Deployment)
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@54.160.243.61 "echo 'SSH connection successful'"
 
       - name: Deploy to EC2
         run: |
