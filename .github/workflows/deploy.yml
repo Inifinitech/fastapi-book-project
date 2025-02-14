@@ -16,12 +16,15 @@ jobs:
       - name: Add SSH key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" | base64 --decode > ec2-key.pem
-          chmod 400 ec2-key.pem
+          chmod 600 ec2-key.pem
+
+      - name: Add EC2 to known hosts
+        run: ssh-keyscan 54.160.243.61 >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
-            cd /path/to/your/project
+          ssh -i ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
+            cd /home/ec2-user/your-project-folder  # Change this to your actual project path
             git pull origin main
             sudo systemctl restart your-service-name  # Restart FastAPI app if needed
           EOF
