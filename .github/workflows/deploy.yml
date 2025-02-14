@@ -13,8 +13,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Trigger Render Deployment
+      - name: Deploy to AWS EC2
         run: |
-            curl -X POST "https://api.render.com/deploy/srv-xxxxxxxxxxxx" \
-            -H "Accept: application/json" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+          ssh -o StrictHostKeyChecking=no ec2-user@54.160.243.61 << 'EOF'
+            cd /path/to/your/app
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart fastapi
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
