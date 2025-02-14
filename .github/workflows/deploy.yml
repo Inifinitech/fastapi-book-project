@@ -13,14 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to AWS EC2
+      - name: Add SSH key
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@54.160.243.61 << 'EOF'
-            cd /path/to/your/app
+          echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
+            cd /path/to/your/project
             git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart fastapi
+            sudo systemctl restart your-service-name  # Restart FastAPI app if needed
           EOF
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
