@@ -31,7 +31,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/ec2-key.pem ec2-user@54.160.243.61 << 'EOF'
             cd /home/ec2-user/fastapi-book-project
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             sudo yum install -y git
             sudo systemctl restart fastapi  # Update this with your actual service name
           EOF
